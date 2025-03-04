@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ survey.title }}{% endblock %}
+
+{% block content %}
+    <h1 class="mb-3 text-primary">{{ survey.title }}</h1>
+    <p class="text-muted mb-4">{{ survey.description }}</p>
+
+    {% if survey.is_active %}
+        <form method="post" action="{% url 'submit_response' survey.id %}" class="p-3 bg-light rounded shadow-sm">
+            {% csrf_token %}
+            {% for question in survey.questions.all %}
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">{{ question.text }}</h5>
+                        {% if question.question_type == 'text' %}
+                            <textarea name="text_{{ question.id }}" class="form-control" rows="3" placeholder="Твой ответ..." required></textarea>
+                        {% elif question.question_type == 'single' %}
+                            {% for option in question.options.all %}
+                                <div class="form-check mb-2">
+                                    <input type="radio" name="option_{{ question.id }}" value="{{ option.id }}" class="form-check-input" required>
+                                    <label class="form-check-label">{{ option.text }}</label>
+                                </div>
+                            {% endfor %}
+                        {% elif question.question_type == 'multiple' %}
+                            {% for option in question.options.all %}
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="option_{{ question.id }}" value="{{ option.id }}" class="form-check-input">
+                                    <label class="form-check-label">{{ option.text }}</label>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            {% if user.is_staff %}
+                <a href="{% url 'edit_survey' survey.id %}" class="btn btn-outline-primary mt-3 me-2">Редактировать опрос</a>
+                <a href="{% url 'delete_survey' survey.id %}" class="btn btn-outline-danger mt-3 me-2">Удалить опрос</a>
+                <a href="{% url 'add_question' survey.id %}" class="btn btn-outline-warning mt-3 me-2">Добавить вопрос</a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary btn-lg mt-3">Подтвердить выбор</button>
+        </form>
+    {% else %}
+        <p class="alert alert-warning rounded">Этот опрос уже закончился</p>
+        {% if user.is_staff %}
+            <a href="{% url 'edit_survey' survey.id %}" class="btn btn-outline-primary mt-3 me-2">Редактировать опрос</a>
+            <a href="{% url 'delete_survey' survey.id %}" class="btn btn-outline-danger mt-3 me-2">Удалить опрос</a>
+        {% endif %}
+        <a href="{% url 'survey_results' survey.id %}" class="btn btn-outline-info mt-3">Посмотреть результаты</a>
+    {% endif %}
+{% endblock %}

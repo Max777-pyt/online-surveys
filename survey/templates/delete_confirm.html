@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} Удалить опрос {% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4 text-danger">Удалить </h2>
+            <p>Ты уверен, что хочешь удалить? Может не надо?)</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">ДА, удалить</button>
+                <a href="{% if type == 'survey' %}{% url 'survey_detail' object.id %}{% else %}{% url 'survey_list' %}{% endif %}" class="btn btn-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

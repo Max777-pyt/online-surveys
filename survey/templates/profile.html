@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4 text-primary">Мой профиль</h2>
+            <form method="post" class="needs-validation p-3 bg-light rounded shadow-sm" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-bold">Имя</label>
+                    <input type="text" name="username" id="username" class="form-control" value="{{ user.username }}" required>
+                    <div class="invalid-feedback">Пожалуйста, введите Ваше имя</div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" value="{{ user.email }}" required>
+                    <div class="invalid-feedback">Пожалуйста, введите Ваш email</div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-bold">Новый пароль (необязательно)</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Leave blank to keep current">
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}MaxOpros | Онлайн-опросник{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4 text-primary">Все доступные опросы</h1>
+
+    <form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="question" class="form-label fw-bold">Фильтр по вопросам</label>
+                <select name="question" id="question" class="form-select">
+                    <option value="">Все вопросы</option>
+                    {% for q in questions %}
+                        <option value="{{ q.id }}" {% if request.GET.question == q.id|stringformat:"s" %}selected{% endif %}>
+                            {{ q.text }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="sort" class="form-label fw-bold">Сортировать по дате</label>
+                <select name="sort" id="sort" class="form-select">
+                    <option value="start_date" {% if request.GET.sort == "start_date" %}selected{% endif %}>Дата начала (по возрастанию)</option>
+                    <option value="-start_date" {% if request.GET.sort == "-start_date" %}selected{% endif %}>Дата начала (по убыванию)</option>
+                    <option value="end_date" {% if request.GET.sort == "end_date" %}selected{% endif %}>Дата окончания (по возрастанию)</option>
+                    <option value="-end_date" {% if request.GET.sort == "-end_date" %}selected{% endif %}>Дата окончания (по убыванию)</option>
+                </select>
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Подтвердить</button>
+            </div>
+        </div>
+    </form>
+
+    {% if surveys %}
+        <div class="row">
+            {% for survey in surveys %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">
+                                <a href="{% url 'survey_detail' survey.id %}" class="text-decoration-none">{{ survey.title }}</a>
+                            </h5>
+                            <p class="card-text text-muted">{{ survey.description }}</p>
+                            <p class="text-muted">
+                                <small>С {{ survey.start_date }} по {{ survey.end_date }}</small>
+                            </p>
+                            {% if survey.is_active %}
+                                <span class="badge bg-success">Активный</span>
+                                {% if user.is_staff %}
+                                    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-sm btn-outline-primary ms-2">Изменить</a>
+                                    <a href="{% url 'delete_survey' survey.id %}" class="btn btn-sm btn-outline-danger ms-2">Удалить</a>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Завершён</span>
+                                {% if user.is_staff %}
+                                    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-sm btn-outline-primary ms-2">Изменить</a>
+                                    <a href="{% url 'delete_survey' survey.id %}" class="btn btn-sm btn-outline-danger ms-2">Удалить</a>
+                                {% endif %}
+                                <a href="{% url 'survey_results' survey.id %}" class="btn btn-sm btn-outline-info ms-2">Итоги</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Нет опросов, удовлетворяющих вашему фильтру</p>
+    {% endif %}
+{% endblock %}
